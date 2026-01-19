@@ -236,7 +236,7 @@ export class ERC4337Service {
       this.provider
     );
 
-    return await factory.getAddress(owner, salt);
+    return await factory["getAddress(address,uint256)"](owner, salt);
   }
 
   /**

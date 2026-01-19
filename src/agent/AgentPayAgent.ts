@@ -107,21 +107,21 @@ export class AgentPayAgent {
 
     switch (task.type) {
       case "payment":
-        return this.executePayment(task.params);
+        return this.executePayment(task.params as any);
       case "batch_payment":
-        return this.executeBatchPayment(task.params);
+        return this.executeBatchPayment(task.params as any);
       case "recurring":
-        return this.setupRecurringPayment(task.params);
+        return this.setupRecurringPayment(task.params as any);
       case "escrow":
-        return this.createEscrow(task.params);
+        return this.createEscrow(task.params as any);
       case "swap":
-        return this.executeSwap(task.params);
+        return this.executeSwap(task.params as any);
       case "portfolio_rebalance":
-        return this.rebalancePortfolio(task.params);
+        return this.rebalancePortfolio(task.params as any);
       case "market_analysis":
-        return this.analyzeMarket(task.params);
+        return this.analyzeMarket(task.params as any);
       case "custom":
-        return this.executeCustomTask(task.params);
+        return this.executeCustomTask(task.params as any);
       default:
         throw new Error(`Unknown task type: ${task.type}`);
     }
