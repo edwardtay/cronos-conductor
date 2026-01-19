@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cronos Conductor - AI Agent Orchestration with x402</title>
+  <meta name="description" content="AI-powered autonomous payment orchestration using x402 protocol on Cronos EVM">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23002D74'/%3E%3Cstop offset='100%25' stop-color='%230052CC'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='url(%23g)'/%3E%3Cpath d='M20 44 L32 16 L44 44' stroke='%23fff' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='20' cy='44' r='4' fill='%2322c55e'/%3E%3Ccircle cx='32' cy='16' r='4' fill='%23f59e0b'/%3E%3Ccircle cx='44' cy='44' r='4' fill='%238b5cf6'/%3E%3Cpath d='M20 44 Q32 36 44 44' stroke='%23fff' stroke-width='2' stroke-dasharray='4 2' fill='none' opacity='0.6'/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-dark: #0a0a0f;
+      --bg-card: rgba(20, 20, 30, 0.8);
+      --bg-glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --text-dim: rgba(255, 255, 255, 0.3);
+      --accent: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.3);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --cyan: #06b6d4;
+      --cronos-blue: #002D74;
+      --cronos-light: #0052CC;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .bg-gradient {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+    }
+
+    .logo-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .logo-subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cronos-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .wallet-module {
+      position: relative;
+    }
+
+    .wallet-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .wallet-pill:hover {
+      border-color: var(--accent);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .wallet-pill .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .wallet-balance {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .wallet-chevron {
+      color: var(--text-muted);
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+
+    .wallet-module.open .wallet-chevron {
+      transform: rotate(180deg);
+    }
+
+    .wallet-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      min-width: 240px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all 0.2s;
+      z-index: 100;
+      overflow: hidden;
+    }
+
+    .wallet-module.open .wallet-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .wallet-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wallet-header-balance {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--success);
+    }
+
+    .wallet-header-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .wallet-address-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .wallet-full-address {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      flex: 1;
+    }
+
+    .wallet-actions {
+      padding: 8px;
+    }
+
+    .wallet-action {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-size: 13px;
+      color: var(--text-muted);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .wallet-action:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    .wallet-action.danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
+
+    .wallet-action-icon {
+      width: 18px;
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--success);
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .x402-badge {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--warning);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      flex: 1;
+      margin-top: 24px;
+      min-height: 0;
+    }
+
+    .sidebar {
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      height: fit-content;
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    /* Flow Diagram */
+    .flow-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+
+    .flow-step:not(:last-child) {
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .flow-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .flow-icon.user { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .flow-icon.conductor { background: linear-gradient(135deg, var(--accent), #7c3aed); }
+    .flow-icon.agents { background: linear-gradient(135deg, var(--cyan), #0891b2); }
+
+    .flow-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flow-text strong {
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .flow-sub {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .flow-arrow {
+      color: var(--text-dim);
+      font-size: 10px;
+      padding-left: 38px;
+      opacity: 0.5;
+    }
+
+    .agent-mini {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      transition: all 0.2s;
+    }
+
+    .agent-mini.active {
+      border-color: var(--accent);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .agent-mini.success {
+      border-color: var(--success);
+    }
+
+    .agent-mini-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .agent-mini-icon.arbitrage { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .agent-mini-icon.sentiment { background: linear-gradient(135deg, #ec4899, #be185d); }
+    .agent-mini-icon.risk { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+    .agent-mini-icon.audit { background: linear-gradient(135deg, #10b981, #059669); }
+    .agent-mini-icon.executor { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+
+    .agent-mini-info { flex: 1; min-width: 0; }
+    .agent-mini-name { font-size: 12px; font-weight: 600; }
+    .agent-mini-price { font-size: 10px; color: var(--warning); font-family: 'JetBrains Mono', monospace; }
+
+    .stats-box {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 6px 0;
+    }
+
+    .stat-label { color: var(--text-muted); }
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+    .stat-value.warning { color: var(--warning); }
+    .stat-value.success { color: var(--success); }
+
+    /* Chat Area */
+    .chat-area {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .conductor-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .conductor-info h2 { font-size: 16px; font-weight: 600; }
+    .conductor-info p { font-size: 12px; color: var(--text-muted); }
+
+    .conductor-fee {
+      margin-left: auto;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: var(--warning);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 400px;
+      max-height: 500px;
+    }
+
+    .message {
+      max-width: 85%;
+      animation: messageIn 0.3s ease-out;
+    }
+
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user { align-self: flex-end; }
+    .message.conductor { align-self: flex-start; }
+
+    .message-content {
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .message.user .message-content {
+      background: var(--accent);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.conductor .message-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-plan {
+      margin-top: 12px;
+      padding: 14px;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 12px;
+    }
+
+    .plan-header {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .plan-agents {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .plan-agent-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: var(--bg-card);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .plan-costs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .plan-cost-item {
+      text-align: center;
+    }
+
+    .plan-cost-label {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .plan-cost-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--warning);
+    }
+
+    /* Protocol Boxes - Shows x402, A2A, Groq visually */
+    .protocol-box {
+      margin: 10px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.3);
+    }
+
+    .protocol-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .protocol-box.a2a .protocol-header { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+    .protocol-box.x402 .protocol-header { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .protocol-box.groq .protocol-header { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+    .protocol-icon { font-size: 14px; }
+    .model-tag { margin-left: auto; font-size: 9px; padding: 2px 6px; background: rgba(0,0,0,0.3); border-radius: 4px; }
+
+    .protocol-body {
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .agent-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      background: var(--bg-card);
+      border-radius: 6px;
+      margin: 2px;
+      font-size: 11px;
+    }
+
+    .header-row {
+      display: flex;
+      gap: 8px;
+      padding: 3px 0;
+    }
+
+    .header-key { color: var(--text-dim); }
+    .header-val { color: var(--text); }
+    .header-val.status-402 { color: var(--warning); font-weight: 600; }
+    .header-val.status-200 { color: var(--success); font-weight: 600; }
+    .header-row.result { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+
+    .ai-reasoning { color: var(--text-muted); line-height: 1.5; font-family: 'Inter', sans-serif; font-size: 12px; }
+
+    .cost-summary {
+      display: flex;
+      gap: 16px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 11px;
+    }
+
+    .cost-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cost-item span:first-child { color: var(--text-dim); font-size: 9px; text-transform: uppercase; }
+    .cost-item span:last-child { color: var(--warning); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+    .cost-item.total span:last-child { color: var(--success); }
+
+    .plan-reasoning {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .message-results { margin-top: 12px; }
+
+    .result-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .result-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .result-card-agent {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .result-card-badges {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .llm-badge {
+      font-size: 9px;
+      padding: 3px 6px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border-radius: 4px;
+    }
+
+    .cost-badge {
+      font-size: 10px;
+      color: var(--warning);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .result-ai {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .ai-label {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .result-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .result-metric {
+      padding: 8px;
+      background: var(--bg-glass);
+      border-radius: 6px;
+    }
+
+    .result-metric-label {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .result-metric-value {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .result-metric-value.success { color: var(--success); }
+    .result-metric-value.warning { color: var(--warning); }
+    .result-metric-value.error { color: var(--error); }
+
+    .message-summary {
+      margin-top: 12px;
+      padding: 14px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 14px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .chat-input-area {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-input::placeholder { color: var(--text-dim); }
+
+    .send-btn {
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .quick-actions {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .disclaimer {
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+    }
+
+    .disclaimer span {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#002D74"/>
+                <stop offset="100%" stop-color="#0052CC"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="30" fill="url(#logoGrad)"/>
+            <path d="M20 46 L32 14 L44 46" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <circle cx="20" cy="46" r="5" fill="#22c55e"/>
+            <circle cx="32" cy="14" r="5" fill="#f59e0b"/>
+            <circle cx="44" cy="46" r="5" fill="#8b5cf6"/>
+            <path d="M20 46 Q32 38 44 46" stroke="#fff" stroke-width="2" stroke-dasharray="4 2" fill="none" opacity="0.6"/>
+            <circle cx="32" cy="42" r="3" fill="#fff" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <div class="logo-title">Cronos Conductor</div>
+          <div class="logo-subtitle">AI Agent Orchestration</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="x402-badge">x402</div>
+        <div class="wallet-module" id="walletModule">
+          <div class="wallet-pill" onclick="toggleWallet()">
+            <span class="status-dot"></span>
+            <span class="wallet-balance" id="walletBalance">2.00 CRO</span>
+            <span class="wallet-chevron">▼</span>
+          </div>
+          <div class="wallet-dropdown">
+            <div class="wallet-header">
+              <div class="wallet-header-balance" id="walletBalanceFull">2.0000 CRO</div>
+              <div class="wallet-header-label">AgentWallet Balance</div>
+            </div>
+            <div class="wallet-address-row">
+              <span class="wallet-full-address" id="walletFullAddress">0x14Cf3DA6Da69F0b5C42cb068D5e92b1fb9c3323C</span>
+            </div>
+            <div class="wallet-actions">
+              <button class="wallet-action" onclick="copyAddress()">
+                <span class="wallet-action-icon">📋</span>
+                Copy Address
+              </button>
+              <button class="wallet-action" onclick="viewExplorer()">
+                <span class="wallet-action-icon">🔗</span>
+                View on Explorer
+              </button>
+              <button class="wallet-action" onclick="refreshWallet()">
+                <span class="wallet-action-icon">🔄</span>
+                Refresh Balance
+              </button>
+              <button class="wallet-action danger" onclick="disconnectWallet()">
+                <span class="wallet-action-icon">⏻</span>
+                Disconnect
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copy-toast" id="copyToast">Address copied!</div>
+    </header>
+
+    <div class="main-layout">
+      <div class="sidebar">
+        <!-- Protocol Stack -->
+        <div class="sidebar-title">Protocol Stack</div>
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <div class="flow-icon user">💬</div>
+            <div class="flow-text">
+              <strong>Groq AI</strong>
+              <span class="flow-sub">Intent</span>
+            </div>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step">
+            <div class="flow-icon conductor">🔗</div>
+            <div class="flow-text">
+              <strong>A2A</strong>
+              <span class="flow-sub">Discovery</span>
+            </div>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step">
+            <div class="flow-icon agents">💰</div>
+            <div class="flow-text">
+              <strong>x402</strong>
+              <span class="flow-sub">Payment</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-Agents -->
+        <div class="sidebar-title">Sub-Agents</div>
+        <div id="agentList">
+          <div class="agent-mini" id="mini-arbitrage">
+            <div class="agent-mini-icon arbitrage">📈</div>
+            <div class="agent-mini-info">
+              <div class="agent-mini-name">Arbitrage</div>
+              <div class="agent-mini-price">0.08 CRO</div>
+            </div>
+          </div>
+          <div class="agent-mini" id="mini-sentiment">
+            <div class="agent-mini-icon sentiment">🐋</div>
+            <div class="agent-mini-info">
+              <div class="agent-mini-name">Sentiment</div>
+              <div class="agent-mini-price">0.06 CRO</div>
+            </div>
+          </div>
+          <div class="agent-mini" id="mini-risk">
+            <div class="agent-mini-icon risk">📊</div>
+            <div class="agent-mini-info">
+              <div class="agent-mini-name">Risk</div>
+              <div class="agent-mini-price">0.05 CRO</div>
+            </div>
+          </div>
+          <div class="agent-mini" id="mini-audit">
+            <div class="agent-mini-icon audit">🔍</div>
+            <div class="agent-mini-info">
+              <div class="agent-mini-name">Audit</div>
+              <div class="agent-mini-price">0.10 CRO</div>
+            </div>
+          </div>
+          <div class="agent-mini" id="mini-executor">
+            <div class="agent-mini-icon executor">⚡</div>
+            <div class="agent-mini-info">
+              <div class="agent-mini-name">Executor</div>
+              <div class="agent-mini-price">0.03 CRO</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-box">
+          <div class="sidebar-title">Session</div>
+          <div class="stat-row">
+            <span class="stat-label">Total Spent</span>
+            <span class="stat-value warning" id="totalSpent">0.00 CRO</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Queries</span>
+            <span class="stat-value" id="queryCount">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-area">
+        <div class="chat-header">
+          <div class="conductor-avatar">🎖️</div>
+          <div class="conductor-info">
+            <h2>Conductor</h2>
+          </div>
+          <div class="conductor-fee">0.02 CRO</div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="message conductor">
+            <div class="message-content">
+              Ask me anything about crypto markets. I'll coordinate the right agents and handle all payments automatically.
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="sendQuick('Market sentiment?')">Sentiment</button>
+          <button class="quick-btn" onclick="sendQuick('Arbitrage opportunities')">Arbitrage</button>
+          <button class="quick-btn" onclick="sendQuick('Should I buy CRO?')">Buy CRO?</button>
+          <button class="quick-btn" onclick="sendQuick('Full analysis')">Full Analysis</button>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="send()">→</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="disclaimer">
+      <span>Cronos Conductor</span> · Built for x402 Paytech Hackathon · Testnet only · Not financial advice
+    </footer>
+  </div>
+
+  <script>
+    const AGENTS = {
+      'agent-arbitrage': { icon: '📈', name: 'Arbitrage', cls: 'arbitrage' },
+      'agent-sentiment': { icon: '🐋', name: 'Sentiment', cls: 'sentiment' },
+      'agent-risk': { icon: '📊', name: 'Risk', cls: 'risk' },
+      'agent-audit': { icon: '🔍', name: 'Audit', cls: 'audit' },
+      'agent-executor': { icon: '⚡', name: 'Executor', cls: 'executor' }
+    };
+
+    let processing = false;
+    let totalSpent = 0;
+    let queries = 0;
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    }
+
+    function sendQuick(text) {
+      document.getElementById('chatInput').value = text;
+      send();
+    }
+
+    async function send() {
+      const input = document.getElementById('chatInput');
+      const goal = input.value.trim();
+      if (!goal || processing) return;
+
+      processing = true;
+      input.value = '';
+      document.getElementById('sendBtn').disabled = true;
+
+      addMsg('user', goal);
+      const typingId = showTyping();
+      resetAgents();
+
+      try {
+        // Step 1: Pay Conductor (x402)
+        const payRes = await fetch('/api/agent/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ serviceId: 'conductor' })
+        });
+        const payData = await payRes.json();
+
+        if (!payData.success) {
+          throw new Error(payData.error || 'Payment failed');
+        }
+
+        // Step 2: Execute via Conductor (with payment proof)
+        const res = await fetch('/api/x402/conductor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Payment': payData.proof
+          },
+          body: JSON.stringify({ goal })
+        });
+
+        const data = await res.json();
+        removeTyping(typingId);
+
+        // Highlight used agents
+        if (data.plan?.agents) {
+          data.plan.agents.forEach(id => {
+            const r = data.results?.find(x => x.agent === id);
+            setAgent(id, r?.status === 'success' ? 'success' : 'active');
+          });
+        }
+
+        // Build response with protocol visibility
+        let html = ``;
+
+        // A2A Protocol Box - Agent Discovery
+        if (data.plan?.agents) {
+          html += `
+            <div class="protocol-box a2a">
+              <div class="protocol-header">
+                <span class="protocol-icon">🔗</span>
+                <span class="protocol-name">A2A Discovery</span>
+              </div>
+              <div class="protocol-body">
+                ${data.plan.agents.map(id => `<span class="agent-tag">${AGENTS[id]?.name || id}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        // x402 Protocol Box - Payment Headers
+        html += `
+          <div class="protocol-box x402">
+            <div class="protocol-header">
+              <span class="protocol-icon">💰</span>
+              <span class="protocol-name">x402 Payment</span>
+            </div>
+            <div class="protocol-body">
+              <div class="header-row"><span class="header-key">HTTP/1.1</span><span class="header-val status-402">402 Payment Required</span></div>
+              <div class="header-row"><span class="header-key">X-Payment:</span><span class="header-val">required</span></div>
+              <div class="header-row"><span class="header-key">X-Payment-Amount:</span><span class="header-val">${data.costs?.totalCost || '0.02 CRO'}</span></div>
+              <div class="header-row"><span class="header-key">X-Payment-Network:</span><span class="header-val">cronos-testnet</span></div>
+              <div class="header-row result"><span class="header-key">→</span><span class="header-val status-200">200 OK (Paid)</span></div>
+            </div>
+          </div>
+        `;
+
+        // Plan with AI reasoning
+        if (data.plan) {
+          html += `
+            <div class="protocol-box groq">
+              <div class="protocol-header">
+                <span class="protocol-icon">🧠</span>
+                <span class="protocol-name">Groq AI</span>
+                <span class="model-tag">llama-3.1-8b</span>
+              </div>
+              <div class="protocol-body">
+                <div class="ai-reasoning">${data.plan.reasoning}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Cost breakdown
+        if (data.costs) {
+          html += `
+            <div class="cost-summary">
+              <div class="cost-item"><span>Conductor</span><span>${data.costs.conductorFee}</span></div>
+              <div class="cost-item"><span>Sub-Agents</span><span>${data.costs.subAgentsPaid}</span></div>
+              <div class="cost-item total"><span>Total</span><span>${data.costs.totalCost}</span></div>
+            </div>
+          `;
+        }
+
+        // Results with AI Analysis
+        if (data.results?.length > 0) {
+          html += `<div class="message-results">`;
+          for (const r of data.results) {
+            if (r.status !== 'success') continue;
+            const a = AGENTS[r.agent];
+            const m = getMetrics(r);
+            const ai = r.data?.aiAnalysis;
+            html += `
+              <div class="result-card">
+                <div class="result-card-header">
+                  <div class="result-card-agent">${a?.icon||'🤖'} ${r.name}</div>
+                  <div class="result-card-badges">
+                    <span class="llm-badge">🧠 Groq</span>
+                    <span class="cost-badge">${r.cost}</span>
+                  </div>
+                </div>
+                <div class="result-metrics">
+                  ${m.map(x => `
+                    <div class="result-metric">
+                      <div class="result-metric-label">${x.label}</div>
+                      <div class="result-metric-value ${x.cls||''}">${x.value}</div>
+                    </div>
+                  `).join('')}
+                </div>
+                ${ai?.analysis ? `<div class="result-ai"><span class="ai-label">AI Analysis:</span> ${ai.analysis.substring(0, 200)}${ai.analysis.length > 200 ? '...' : ''}</div>` : ''}
+              </div>
+            `;
+          }
+          html += `</div>`;
+        }
+
+        // Summary
+        if (data.summary) {
+          html += `<div class="message-summary">${data.summary}</div>`;
+        }
+
+        addMsg('conductor', html, true);
+
+        // Update stats
+        totalSpent += parseFloat(data.costs?.totalCost) || 0;
+        queries++;
+        document.getElementById('totalSpent').textContent = totalSpent.toFixed(2) + ' CRO';
+        document.getElementById('queryCount').textContent = queries;
+        loadWallet();
+
+      } catch (err) {
+        removeTyping(typingId);
+        addMsg('conductor', `Error: ${err.message}`);
+      }
+
+      processing = false;
+      document.getElementById('sendBtn').disabled = false;
+    }
+
+    function getMetrics(r) {
+      const m = [], d = r.data;
+      if (!d) return m;
+      if (r.agent === 'agent-arbitrage') {
+        m.push({ label: 'Opportunities', value: d.analysis?.opportunitiesFound || 0, cls: d.analysis?.opportunitiesFound > 0 ? 'success' : '' });
+        m.push({ label: 'Flash Loan', value: d.flashLoanOpportunity?.viable ? 'Yes' : 'No', cls: d.flashLoanOpportunity?.viable ? 'success' : '' });
+      } else if (r.agent === 'agent-sentiment') {
+        m.push({ label: 'Sentiment', value: d.sentiment?.label || 'N/A', cls: d.sentiment?.label === 'Bullish' ? 'success' : d.sentiment?.label === 'Bearish' ? 'error' : 'warning' });
+        m.push({ label: 'Confidence', value: ((d.sentiment?.confidence || 0) * 100).toFixed(0) + '%' });
+      } else if (r.agent === 'agent-risk') {
+        m.push({ label: 'Sharpe', value: d.riskMetrics?.sharpeRatio?.value?.toFixed(2) || 'N/A' });
+        m.push({ label: 'Risk', value: d.summary?.riskLevel || 'N/A' });
+      } else if (r.agent === 'agent-audit') {
+        const g = d.verdict?.grade || 'N/A';
+        m.push({ label: 'Grade', value: g, cls: ['A','B'].includes(g) ? 'success' : g === 'C' ? 'warning' : 'error' });
+        m.push({ label: 'Safe', value: d.verdict?.safeToInteract ? 'Yes' : 'No', cls: d.verdict?.safeToInteract ? 'success' : 'error' });
+      } else if (r.agent === 'agent-executor') {
+        m.push({ label: 'Best DEX', value: d.bestRoute?.dex || 'N/A' });
+        m.push({ label: 'MEV Risk', value: d.mevProtection?.riskLevel || 'N/A' });
+      }
+      return m;
+    }
+
+    function addMsg(type, content, isHtml = false) {
+      const c = document.getElementById('chatMessages');
+      const el = document.createElement('div');
+      el.className = `message ${type}`;
+      el.innerHTML = `<div class="message-content">${isHtml ? content : esc(content)}</div>`;
+      c.appendChild(el);
+      c.scrollTop = c.scrollHeight;
+    }
+
+    function showTyping() {
+      const c = document.getElementById('chatMessages');
+      const el = document.createElement('div');
+      el.className = 'message conductor';
+      el.id = 'typing-' + Date.now();
+      el.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+      c.appendChild(el);
+      c.scrollTop = c.scrollHeight;
+      return el.id;
+    }
+
+    function removeTyping(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function resetAgents() {
+      document.querySelectorAll('.agent-mini').forEach(el => el.classList.remove('active', 'success'));
+    }
+
+    function setAgent(id, state) {
+      const el = document.getElementById(`mini-${id.replace('agent-', '')}`);
+      if (el) { el.classList.remove('active', 'success'); el.classList.add(state); }
+    }
+
+    function esc(t) {
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    let walletAddress = '0x14Cf3DA6Da69F0b5C42cb068D5e92b1fb9c3323C';
+
+    async function loadWallet() {
+      try {
+        const r = await fetch('/api/wallet/status');
+        const d = await r.json();
+        walletAddress = d.address;
+        document.getElementById('walletBalance').textContent = parseFloat(d.balance).toFixed(2) + ' CRO';
+        document.getElementById('walletBalanceFull').textContent = parseFloat(d.balance).toFixed(4) + ' CRO';
+        document.getElementById('walletFullAddress').textContent = d.address;
+      } catch (e) {}
+    }
+
+    function toggleWallet() {
+      document.getElementById('walletModule').classList.toggle('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      const mod = document.getElementById('walletModule');
+      if (!mod.contains(e.target)) mod.classList.remove('open');
+    });
+
+    function copyAddress() {
+      navigator.clipboard.writeText(walletAddress);
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+      toggleWallet();
+    }
+
+    function viewExplorer() {
+      window.open('https://testnet.cronoscan.com/address/' + walletAddress, '_blank');
+      toggleWallet();
+    }
+
+    function refreshWallet() {
+      loadWallet();
+      toggleWallet();
+    }
+
+    function disconnectWallet() {
+      document.getElementById('walletBalance').textContent = '—';
+      document.getElementById('walletBalanceFull').textContent = 'Disconnected';
+      document.getElementById('walletModule').classList.remove('open');
+    }
+
+    loadWallet();
+  </script>
+</body>
+</html>

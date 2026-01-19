@@ -1,0 +1,12 @@
+{
+  "network": "cronosTestnet",
+  "chainId": 338,
+  "deployer": "0x15ECEE3445E3C8cf28D4D93fAB50181de728b86d",
+  "contracts": {
+    "AgentPayGateway": "0xc9995e5d8a059C4B6409488e3D30b04CB78b6120",
+    "SettlementEngine": "0x8407391932E10Ced2459b6A628dc617462eE190a",
+    "EscrowManager": "0x390c17AC063F7E64c93ccC1E3a9381b14D68fB64",
+    "AgentWallet": "0x14Cf3DA6Da69F0b5C42cb068D5e92b1fb9c3323C"
+  },
+  "timestamp": "2026-01-17T19:09:49.136Z"
+}
