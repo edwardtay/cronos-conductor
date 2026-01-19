@@ -8,12 +8,13 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x000000000000000000000000000000
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.20",
+    version: "0.8.24",
     settings: {
       optimizer: {
         enabled: true,
         runs: 200
-      }
+      },
+      evmVersion: "paris"
     }
   },
   networks: {
@@ -23,8 +24,8 @@ const config: HardhatUserConfig = {
     cronosTestnet: {
       url: "https://evm-t3.cronos.org",
       chainId: 338,
-      accounts: [PRIVATE_KEY],
-      gasPrice: 5000000000000 // 5000 Gwei
+      accounts: [PRIVATE_KEY]
+      // Let Hardhat auto-estimate gas price
     },
     cronosMainnet: {
       url: "https://evm.cronos.org",

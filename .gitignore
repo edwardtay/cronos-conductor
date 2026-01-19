@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Private folder (development files not for submission)
+private/
+
 # Dependencies
 node_modules/
 
@@ -31,5 +34,8 @@ coverage/
 coverage.json
 
 # Hardhat
-deployments/local/
+deployments/
+
+# Vercel
+.vercel/
 .vercel

@@ -1,21 +1,15 @@
 {
-  "name": "agentpay-protocol",
+  "name": "cronos-conductor",
   "version": "1.0.0",
-  "description": "AI-powered autonomous payment orchestration system using x402 on Cronos EVM",
-  "main": "dist/index.js",
+  "description": "AI Agent Orchestration with x402 Payment Protocol on Cronos EVM",
+  "main": "dist/x402-server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "server": "ts-node src/server-prod.ts",
-    "demo": "ts-node src/x402-server.ts",
-    "start:x402": "ts-node src/x402-server.ts",
+    "start": "node dist/x402-server.js",
+    "dev": "ts-node src/x402-server.ts",
     "mcp": "ts-node src/mcp-server.ts",
-    "agent": "ts-node src/agent/index.ts",
     "compile": "hardhat compile",
-    "test": "hardhat test",
-    "deploy:testnet": "hardhat run scripts/deploy.ts --network cronosTestnet",
-    "deploy:mainnet": "hardhat run scripts/deploy.ts --network cronosMainnet"
+    "deploy:testnet": "hardhat run scripts/deploy.ts --network cronosTestnet"
   },
   "keywords": [
     "x402",
