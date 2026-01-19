@@ -32,3 +32,4 @@ coverage.json
 
 # Hardhat
 deployments/local/
+.vercel

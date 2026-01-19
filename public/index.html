@@ -11,21 +11,21 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-dark: #0a0a0f;
-      --bg-card: rgba(20, 20, 30, 0.8);
-      --bg-glass: rgba(255, 255, 255, 0.03);
-      --border: rgba(255, 255, 255, 0.08);
+      --bg-dark: #000000;
+      --bg-card: rgba(15, 15, 15, 0.9);
+      --bg-glass: rgba(255, 255, 255, 0.02);
+      --border: rgba(255, 255, 255, 0.1);
       --text: #ffffff;
-      --text-muted: rgba(255, 255, 255, 0.5);
-      --text-dim: rgba(255, 255, 255, 0.3);
-      --accent: #8b5cf6;
-      --accent-glow: rgba(139, 92, 246, 0.3);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --error: #ef4444;
-      --cyan: #06b6d4;
-      --cronos-blue: #002D74;
-      --cronos-light: #0052CC;
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --text-dim: rgba(255, 255, 255, 0.4);
+      --accent: #ffffff;
+      --accent-glow: rgba(255, 255, 255, 0.1);
+      --success: #ffffff;
+      --warning: #888888;
+      --error: #666666;
+      --cyan: #cccccc;
+      --cronos-blue: #333333;
+      --cronos-light: #555555;
     }
 
     body {
@@ -38,9 +38,7 @@
     .bg-gradient {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+      background: #000000;
       pointer-events: none;
       z-index: 0;
     }
@@ -122,8 +120,8 @@
     }
 
     .wallet-pill:hover {
-      border-color: var(--accent);
-      background: rgba(139, 92, 246, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.05);
     }
 
     .wallet-pill .status-dot {
@@ -336,9 +334,9 @@
       flex-shrink: 0;
     }
 
-    .flow-icon.user { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-    .flow-icon.conductor { background: linear-gradient(135deg, var(--accent), #7c3aed); }
-    .flow-icon.agents { background: linear-gradient(135deg, var(--cyan), #0891b2); }
+    .flow-icon.user { background: #333; }
+    .flow-icon.conductor { background: #444; }
+    .flow-icon.agents { background: #555; }
 
     .flow-text {
       display: flex;
@@ -394,11 +392,11 @@
       flex-shrink: 0;
     }
 
-    .agent-mini-icon.arbitrage { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .agent-mini-icon.sentiment { background: linear-gradient(135deg, #ec4899, #be185d); }
-    .agent-mini-icon.risk { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-    .agent-mini-icon.audit { background: linear-gradient(135deg, #10b981, #059669); }
-    .agent-mini-icon.executor { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .agent-mini-icon.arbitrage { background: #333; }
+    .agent-mini-icon.sentiment { background: #444; }
+    .agent-mini-icon.risk { background: #555; }
+    .agent-mini-icon.audit { background: #666; }
+    .agent-mini-icon.executor { background: #777; }
 
     .agent-mini-info { flex: 1; min-width: 0; }
     .agent-mini-name { font-size: 12px; font-weight: 600; }
@@ -444,7 +442,7 @@
     .conductor-avatar {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      background: #333;
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -457,8 +455,8 @@
 
     .conductor-fee {
       margin-left: auto;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 6px 12px;
       border-radius: 8px;
       font-size: 11px;
@@ -588,9 +586,9 @@
       letter-spacing: 0.5px;
     }
 
-    .protocol-box.a2a .protocol-header { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
-    .protocol-box.x402 .protocol-header { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-    .protocol-box.groq .protocol-header { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .protocol-box.a2a .protocol-header { background: rgba(255, 255, 255, 0.05); color: #999; }
+    .protocol-box.x402 .protocol-header { background: rgba(255, 255, 255, 0.05); color: #888; }
+    .protocol-box.groq .protocol-header { background: rgba(255, 255, 255, 0.05); color: #aaa; }
 
     .protocol-icon { font-size: 14px; }
     .model-tag { margin-left: auto; font-size: 9px; padding: 2px 6px; background: rgba(0,0,0,0.3); border-radius: 4px; }
@@ -802,11 +800,11 @@
     .chat-input::placeholder { color: var(--text-dim); }
 
     .send-btn {
-      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      background: #fff;
       border: none;
       border-radius: 12px;
       padding: 14px 24px;
-      color: white;
+      color: #000;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
@@ -816,7 +814,7 @@
 
     .send-btn:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px var(--accent-glow);
+      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1);
     }
 
     .send-btn:disabled {
@@ -879,15 +877,15 @@
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#002D74"/>
-                <stop offset="100%" stop-color="#0052CC"/>
+                <stop offset="0%" stop-color="#222"/>
+                <stop offset="100%" stop-color="#444"/>
               </linearGradient>
             </defs>
             <circle cx="32" cy="32" r="30" fill="url(#logoGrad)"/>
             <path d="M20 46 L32 14 L44 46" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
-            <circle cx="20" cy="46" r="5" fill="#22c55e"/>
-            <circle cx="32" cy="14" r="5" fill="#f59e0b"/>
-            <circle cx="44" cy="46" r="5" fill="#8b5cf6"/>
+            <circle cx="20" cy="46" r="5" fill="#888"/>
+            <circle cx="32" cy="14" r="5" fill="#aaa"/>
+            <circle cx="44" cy="46" r="5" fill="#ccc"/>
             <path d="M20 46 Q32 38 44 46" stroke="#fff" stroke-width="2" stroke-dasharray="4 2" fill="none" opacity="0.6"/>
             <circle cx="32" cy="42" r="3" fill="#fff" opacity="0.8"/>
           </svg>
@@ -898,7 +896,6 @@
         </div>
       </div>
       <div class="header-right">
-        <div class="x402-badge">x402</div>
         <div class="wallet-module" id="walletModule">
           <div class="wallet-pill" onclick="toggleWallet()">
             <span class="status-dot"></span>
@@ -1052,7 +1049,7 @@
     </div>
 
     <footer class="disclaimer">
-      <span>Cronos Conductor</span> · Built for x402 Paytech Hackathon · Testnet only · Not financial advice
+      <span>Cronos Conductor</span> · Testnet · Not financial advice
     </footer>
   </div>
 
@@ -1146,22 +1143,6 @@
           `;
         }
 
-        // x402 Protocol Box - Payment Headers
-        html += `
-          <div class="protocol-box x402">
-            <div class="protocol-header">
-              <span class="protocol-icon">💰</span>
-              <span class="protocol-name">x402 Payment</span>
-            </div>
-            <div class="protocol-body">
-              <div class="header-row"><span class="header-key">HTTP/1.1</span><span class="header-val status-402">402 Payment Required</span></div>
-              <div class="header-row"><span class="header-key">X-Payment:</span><span class="header-val">required</span></div>
-              <div class="header-row"><span class="header-key">X-Payment-Amount:</span><span class="header-val">${data.costs?.totalCost || '0.02 CRO'}</span></div>
-              <div class="header-row"><span class="header-key">X-Payment-Network:</span><span class="header-val">cronos-testnet</span></div>
-              <div class="header-row result"><span class="header-key">→</span><span class="header-val status-200">200 OK (Paid)</span></div>
-            </div>
-          </div>
-        `;
 
         // Plan with AI reasoning
         if (data.plan) {
