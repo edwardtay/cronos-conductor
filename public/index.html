@@ -1057,6 +1057,9 @@
   </div>
 
   <script>
+    // API Base URL - empty for same-origin, or Cloud Run URL for Vercel deployment
+    const API_BASE = window.location.hostname === 'localhost' ? '' : 'https://cronos-conductor-660587902574.us-central1.run.app';
+
     const AGENTS = {
       'agent-arbitrage': { icon: '📈', name: 'Arbitrage', cls: 'arbitrage' },
       'agent-sentiment': { icon: '🐋', name: 'Sentiment', cls: 'sentiment' },
@@ -1093,7 +1096,7 @@
 
       try {
         // Step 1: Pay Conductor (x402)
-        const payRes = await fetch('/api/agent/pay', {
+        const payRes = await fetch(API_BASE + '/api/agent/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ serviceId: 'conductor' })
@@ -1105,7 +1108,7 @@
         }
 
         // Step 2: Execute via Conductor (with payment proof)
-        const res = await fetch('/api/x402/conductor', {
+        const res = await fetch(API_BASE + '/api/x402/conductor', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1309,7 +1312,7 @@
 
     async function loadWallet() {
       try {
-        const r = await fetch('/api/wallet/status');
+        const r = await fetch(API_BASE + '/api/wallet/status');
         const d = await r.json();
         walletAddress = d.address;
         document.getElementById('walletBalance').textContent = parseFloat(d.balance).toFixed(2) + ' CRO';
